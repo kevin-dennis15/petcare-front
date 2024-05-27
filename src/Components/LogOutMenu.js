@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Cookies from 'js-cookie';
 
 function LogOutMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -17,6 +18,7 @@ function LogOutMenu() {
     }
     else
      if(event.currentTarget.innerText==="Log Out"){
+        Cookies.remove('token');
         navigate('/');
     }
     setAnchorEl(null);

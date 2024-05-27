@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
 import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
@@ -13,6 +15,19 @@ function AddPetForm() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarType, setSnackbarType] = useState('success'); // or 'error'
+
+    useEffect(() => {
+        // Retrieve token from cookie
+        const token = Cookies.get('token');
+        if (token) {
+            // Decode token to get user email
+            const decodedToken = jwtDecode(token);
+            const email = decodedToken.sub;
+
+            // Set the owner email in the state
+            setOwnerEmail(email);
+        }
+    }, []);
 
     const handleAddPet = async () => {
         try {
@@ -34,13 +49,11 @@ function AddPetForm() {
             setBreed('');
             setAge('');
             setNotes('');
-            setOwnerEmail('');
         } catch (error) {
             console.error('Error:', error);
             setSnackbarType('error');
             setSnackbarMessage('Failed to add pet');
             setSnackbarOpen(true);
-            // Handle error
         }
     };
 
@@ -53,7 +66,7 @@ function AddPetForm() {
             <div className="bg-white rounded-lg shadow p-6 w-1/3 my-5">
                 <h3 className="text-lg font-semibold mb-2">Add Pet</h3>
                 <form>
-                <div className="mb-4">
+                    <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Name:</label>
                         <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="form-input mt-1 block w-full h-10 border-2 rounded-md" />
                     </div>
@@ -75,7 +88,7 @@ function AddPetForm() {
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Owner Email:</label>
-                        <input type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} className="form-input mt-1 h-10 block w-full border-2 rounded-md" />
+                        <input type="email" value={ownerEmail} readOnly className="form-input mt-1 h-10 block w-full border-2 rounded-md bg-gray-200" />
                     </div>
                     <button type="button" onClick={handleAddPet} className="Bg-color text-white py-2 px-4 rounded hover:bg-gray-900">Add Pet</button>
                 </form>
