@@ -135,7 +135,7 @@ function ForgotPasswordDialog() {
                 >
                   Send OTP
                 </button>
-                <a href="/signi" className="text-gray-500 text-sm font-semibold mr-0 underline">Cancel</a>
+                <a href="/signin" className="text-gray-500 text-sm font-semibold mr-0 underline">Cancel</a>
               </div>
             </form>
             {/* {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>} */}

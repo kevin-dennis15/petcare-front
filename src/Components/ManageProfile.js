@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import Snackbar from '@mui/material/Snackbar';
+import SnackbarContent from '@mui/material/SnackbarContent';
 
 function ManageProfile() {
     const [isEditing, setIsEditing] = useState(false);
@@ -11,20 +13,18 @@ function ManageProfile() {
         phoneNumber: '',
         address: ''
     });
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     useEffect(() => {
-        // Retrieve token from cookie
         const token = Cookies.get('token');
         if (token) {
-            // Decode token to get user email
             const decodedToken = jwtDecode(token);
             const email = decodedToken.sub;
 
-            // Use email to fetch user data
             axios.get(`http://localhost:8090/api/v1/auth/getuser?email=${email}`)
                 .then(response => {
                     const userData = response.data;
-                    // Set form data with user details
                     setFormData({
                         firstName: userData.firstName,
                         lastName: userData.lastName,
@@ -45,27 +45,25 @@ function ManageProfile() {
     const handleSaveClick = () => {
         const token = Cookies.get('token');
         if (token) {
-            // Decode token to get user email
             const decodedToken = jwtDecode(token);
             const email = decodedToken.sub;
-            console.log(email);
-        
 
-        // Example of sending edited data to backend
-        axios.put('http://localhost:8090/api/v1/auth/updateUser', formData,{
-            headers: {
-                email: email
-            }
-        })
-        .then(response => {
-            console.log('Profile data updated successfully:', response.data);
-            setIsEditing(false); // Turn off editing mode after saving
-            console.log('Profile data saved:', formData);
+            axios.put('http://localhost:8090/api/v1/auth/updateUser', formData, {
+                headers: {
+                    email: email
+                }
+            })
+            .then(response => {
+                console.log('Profile data updated successfully:', response.data);
+                setIsEditing(false); // Turn off editing mode after saving
+                setSnackbarMessage('Profile updated successfully');
+                setSnackbarOpen(true); // Show snackbar
             })
             .catch(error => {
                 console.error('Error updating profile data:', error);
             });
-    };}
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -73,6 +71,10 @@ function ManageProfile() {
             ...formData,
             [name]: value
         });
+    };
+
+    const closeSnackbar = () => {
+        setSnackbarOpen(false);
     };
 
     return (
@@ -105,6 +107,18 @@ function ManageProfile() {
                     <span className="ml-2">Edit Info</span>
                 </label>
             </div>
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={closeSnackbar}
+            >
+                <SnackbarContent
+                    message={snackbarMessage}
+                    style={{ backgroundColor: '#4caf50' }}
+                    action={<button className="text-white" onClick={closeSnackbar}>Close</button>}
+                />
+            </Snackbar>
         </div>
     );
 }
